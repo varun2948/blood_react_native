@@ -98,10 +98,10 @@ class Main extends React.Component {
                 <Block card shadow color="white" style={styles.headerChart}>
 
                     <View style={[{
-                        // width: '100%',
-                        height: '30%',
-                        // justifyContent: 'center',
-                        // alignItems: 'center'
+                        width: '100%',
+                        // height: '30%',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }]}>
                         <Button
                             onPress={() => this.props.navigation.navigate('AnotherHome')}
@@ -173,6 +173,7 @@ class Main extends React.Component {
           </Text>
                 </Block>
             </Block>
+
         );
     }
     HomePage() {
@@ -199,8 +200,22 @@ class Main extends React.Component {
                     {requests.map(request => (
                         <TouchableOpacity activeOpacity={0.8} key={`request-${request.id}`}>
                             {this.renderRequest(request)}
+
                         </TouchableOpacity>
                     ))}
+                    <View style={[{
+                        width: 100,
+                        // height: '30%',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }]}>
+                        <Button
+                            onPress={() => this.props.navigation.navigate('LoginView')}
+                            title="LogIn"
+                            color="#841584"
+                            accessibilityLabel="Learn more about this purple button"
+                        />
+                    </View>
                 </ScrollView>
             </Block>
         );

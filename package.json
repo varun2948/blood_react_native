@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "expo": "^32.0.0",
+    "expo-location": "^5.0.1",
+    "geolib": "^3.0.4",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-svg-charts": "^5.2.0",

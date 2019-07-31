@@ -1,12 +1,15 @@
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import Main from './Main';
 import { Home } from "./components";
-import AnotherHome from './AnotherHome.js';
+import Spielplaetze from './AnotherHome1.js';
+import LoginView from './components/Login';
 
 const MainNavigator = createStackNavigator({
     Main: { screen: Main },
     // Home: { screen: Home }
-    AnotherHome: { screen: AnotherHome }
+    AnotherHome: { screen: Spielplaetze },
+    LoginView: { screen: LoginView }
+
 },
     {
         headerMode: 'none',
