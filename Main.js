@@ -79,9 +79,7 @@ class Main extends React.Component {
             </LineChart>
         );
     }
-    buttonClick() {
-        console.log("CLICKED");
-    };
+
     renderHeader() {
         const { user } = this.props;
 
@@ -104,7 +102,7 @@ class Main extends React.Component {
                         alignItems: 'center'
                     }]}>
                         <Button
-                            onPress={() => this.props.navigation.navigate('AnotherHome')}
+                            onPress={() => this.props.navigation.navigate('MapPage')}
                             title="Go to Next Page"
                             color="#841584"
                             accessibilityLabel="Learn more about this purple button"
@@ -204,7 +202,7 @@ class Main extends React.Component {
                         </TouchableOpacity>
                     ))}
                     <View style={[{
-                        width: 100,
+                        width: '100%',
                         // height: '30%',
                         justifyContent: 'center',
                         alignItems: 'center'
@@ -264,9 +262,9 @@ const styles = StyleSheet.create({
         zIndex: 1
     },
     avatar: {
-        width: 25,
-        height: 25,
-        borderRadius: 25 / 2,
+        width: 50,
+        height: 50,
+        borderRadius: 50 / 2,
         marginRight: 5,
     },
     requests: {

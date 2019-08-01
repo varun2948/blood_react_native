@@ -29,9 +29,10 @@ class Grillplaetze extends React.Component {
                 longitudeDelta: 0.020
             },
             markers: [],
+            data: [],
             loaded: false,
-            radius: 40 * 1000,
-            value: 40 * 1000
+            radius: 400 * 1000,
+            value: 400 * 1000
 
         }
 
@@ -71,19 +72,26 @@ class Grillplaetze extends React.Component {
                 let { region } = this.state;
                 let { latitude, longitude } = region;
 
+
                 let markers = responseData.features.map(feature => {
                     let coords = feature.geometry.coordinates
+                    let data = feature.properties
 
                     return {
                         coordinate: {
                             latitude: coords[1],
                             longitude: coords[0],
+                        },
+                        properties: {
+                            bloodtype: data.blood_type,
+                            Name: data.name
                         }
                     }
                 }).filter(marker => {
                     let distance = this.calculateDistance(latitude, longitude, marker.coordinate.latitude, marker.coordinate.longitude);
                     return distance <= this.state.value;
                 });
+
 
                 this.setState({
                     markers: markers,
@@ -101,12 +109,12 @@ class Grillplaetze extends React.Component {
 
 
     render() {
-
+        console.log(this.state.markers, "markers");
         return (
             <View style={styles.container}>
                 <View style={styles.slider}>
                     <Slider
-                        maximumValue={1000}
+                        maximumValue={this.state.radius}
                         minimumValue={100}
                         step={100}
                         value={this.state.value}
@@ -116,7 +124,7 @@ class Grillplaetze extends React.Component {
                         }}
                     />
                     <View>
-                        <Text>Radius: {this.state.value} km</Text>
+                        <Text>Radius: {this.state.value} m</Text>
                     </View>
                 </View>
 
@@ -125,11 +133,20 @@ class Grillplaetze extends React.Component {
                     region={this.state.region}
                     showsUserLocation={true}
                 >
+
                     {this.state.markers.map(marker => (
+
                         <MapView.Marker
                             key={Math.random()}
+                            style={{ width: 40, height: 40 }}
                             coordinate={marker.coordinate}
+                            description="Varun"
+                            title={marker.properties.title}
+                            // opacity={0.5}
+                            image={require('./assets/mark80.bmp')}
+                        // icon={require('./assets/varun.jpg')}
                         />
+
                     ))}
                     <MapView.Circle
                         center={this.state.region}

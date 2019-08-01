@@ -1,9 +1,9 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": 19000,
-  "packagerPort": 19001,
-  "packagerPid": 6003,
-  "expoServerNgrokUrl": "https://ru-q4f.anonymous.iblood.exp.direct",
-  "packagerNgrokUrl": "https://packager.ru-q4f.anonymous.iblood.exp.direct",
-  "ngrokPid": 6075
+  "expoServerPort": null,
+  "packagerPort": null,
+  "packagerPid": null,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null
 }

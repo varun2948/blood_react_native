@@ -2,8 +2,8 @@ const requests = [
   {
     id: 1,
     bloodType: "B+",
-    name: "Ronald Dixon",
-    age: 24,
+    name: "Varun Pradhan",
+    age: 21,
     gender: "Male",
     distance: 28,
     time: 12,
@@ -12,8 +12,8 @@ const requests = [
   {
     id: 2,
     bloodType: "O-",
-    name: "Kathy Bates",
-    age: 19,
+    name: "Samir Dangal",
+    age: 22,
     gender: "Female",
     distance: 10,
     time: 22,
@@ -22,8 +22,8 @@ const requests = [
   {
     id: 3,
     bloodType: "A+",
-    name: "Edward Sanders",
-    age: 6,
+    name: "Nishon Tandukar",
+    age: 23,
     gender: "Male",
     distance: 15.3,
     time: 24,
@@ -53,7 +53,7 @@ const chart = [
 ];
 
 const user = {
-  avatar: require('./assets/avatar.png')
+  avatar: require('./assets/varun.jpg')
 };
 
 export { requests, chart, user }
