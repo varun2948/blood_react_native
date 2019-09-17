@@ -31,8 +31,8 @@ class Grillplaetze extends React.Component {
             markers: [],
             data: [],
             loaded: false,
-            radius: 400 * 1000,
-            value: 400 * 1000
+            radius: 40 * 1000,
+            value: 40 * 1000
 
         }
 
