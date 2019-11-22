@@ -8,7 +8,7 @@ import {
     View,
     TouchableOpacity
 } from "react-native";
-import { Font } from "expo";
+import * as Font from "expo-font";
 import { LineChart, Path } from 'react-native-svg-charts';
 import { Line } from "react-native-svg";
 import * as shape from 'd3-shape';
@@ -90,7 +90,21 @@ class Main extends React.Component {
                         <Text h3 white style={{ marginRight: -(25 + 5) }}>
                             Blood Requests Varun
             </Text>
+                        <Button
+                            onPress={() => this.props.navigation.navigate('SignIn')}
+                            title="LogIn"
+                            color="#841584"
+                            accessibilityLabel="Learn more about this purple button"
+                        />
+                        <Button
+                            onPress={() => this.props.navigation.navigate('SignUp')}
+                            title="SignUp"
+                            color="#841584"
+                            style={styles.signUpbtn}
+                            accessibilityLabel="Learn more about this purple button"
+                        />
                     </Block>
+
                     <Image style={styles.avatar} source={user.avatar} />
                 </Block>
                 <Block card shadow color="white" style={styles.headerChart}>
@@ -266,6 +280,12 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 50 / 2,
         marginRight: 5,
+    },
+    signUpbtn: {
+        // width: 50,
+        // height: 50,
+        // borderRadius: 50 / 2,
+        // marginRight: 5,
     },
     requests: {
         marginTop: -55,

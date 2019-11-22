@@ -2,17 +2,17 @@ import { createStackNavigator, createAppContainer } from 'react-navigation';
 import Main from './Main';
 import { Home } from "./components";
 import Spielplaetze from './MapPage';
-import LoginView from './components/Login';
+import SignIn from './SignIn';
 import Loading from './components/Loading';
-import SignUp from './components/Signup';
-import Login from './components/Login1';
+import SignUp from './SignUp';
 import MainHome from './components/MainHome';
 
 const MainNavigator = createStackNavigator({
     Main: { screen: Main },
     // Home: { screen: Home }
     MapPage: { screen: Spielplaetze },
-    LoginView: { screen: LoginView }
+    SignIn: { screen: SignIn },
+    SignUp: { screen: SignUp }
 
 },
     {

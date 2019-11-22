@@ -3,6 +3,7 @@ import MapView from 'react-native-maps';
 import { Markers } from 'react-native-maps';
 import { Slider } from 'react-native';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
+import * as firebase from "firebase";
 
 import {
     View,
@@ -28,6 +29,7 @@ class Grillplaetze extends React.Component {
                 latitudeDelta: 0.020,
                 longitudeDelta: 0.020
             },
+            arrData: [],
             markers: [],
             data: [],
             loaded: false,
@@ -97,7 +99,10 @@ class Grillplaetze extends React.Component {
                     markers: markers,
                     loaded: true,
                 });
+
+                // console.log(this.state.arrData)
             }).done();
+
     }
 
     calculateDistance(origLat, origLon, markerLat, markerLon) {
@@ -109,7 +114,8 @@ class Grillplaetze extends React.Component {
 
 
     render() {
-        console.log(this.state.markers, "markers");
+
+        // console.log(this.state.markers, "markers");
         return (
             <View style={styles.container}>
                 <View style={styles.slider}>
@@ -136,6 +142,7 @@ class Grillplaetze extends React.Component {
 
                     {this.state.markers.map(marker => (
 
+
                         <MapView.Marker
                             key={Math.random()}
                             style={{ width: 40, height: 40 }}
@@ -146,6 +153,7 @@ class Grillplaetze extends React.Component {
                             image={require('./assets/mark80.bmp')}
                         // icon={require('./assets/varun.jpg')}
                         />
+
 
                     ))}
                     <MapView.Circle
