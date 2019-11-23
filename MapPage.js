@@ -62,7 +62,7 @@ class Grillplaetze extends React.Component {
                 }, () => this.getLocations());
             },
             (error) => this.setState({ error: error.message }),
-            { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
+            { enableHighAccuracy: false, timeout: 2000, maximumAge: 1000 },
         );
     }
 
@@ -71,38 +71,94 @@ class Grillplaetze extends React.Component {
         return fetch('http://hydromap.nitifoundation.org/api/Hydropower/')
             .then(response => response.json())
             .then(responseData => {
-                let { region } = this.state;
-                let { latitude, longitude } = region;
+                // let { region } = this.state;
+                // let { latitude, longitude } = region;
 
 
-                let markers = responseData.features.map(feature => {
-                    let coords = feature.geometry.coordinates
-                    let data = feature.properties
+                // let markers = responseData.features.map(feature => {
+                //     let coords = feature.geometry.coordinates
+                //     let data = feature.properties
 
-                    return {
-                        coordinate: {
-                            latitude: coords[1],
-                            longitude: coords[0],
-                        },
-                        properties: {
-                            bloodtype: data.blood_type,
-                            Name: data.name
+                //     return {
+                //         coordinate: {
+                //             latitude: coords[1],
+                //             longitude: coords[0],
+                //         },
+                //         properties: {
+                //             bloodtype: data.blood_type,
+                //             Name: data.name
+                //         }
+                //     }
+                // }).filter(marker => {
+                //     let distance = this.calculateDistance(latitude, longitude, marker.coordinate.latitude, marker.coordinate.longitude);
+                //     return distance <= this.state.value;
+                // });
+
+
+                // this.setState({
+                //     markers: markers,
+                //     loaded: true,
+                // });
+                var ref = firebase.database().ref("users"); //Here assuming 'Users' as main table of contents   
+
+                ref.once('value').then(snapshot => {
+                    console.log(snapshot.val());
+
+                    // get children as an array
+                    var items = [];
+                    snapshot.forEach((child) => {
+                        items.push({
+                            id: child.val().id,
+                            name: child.val().name,
+                            available_time_period: child.val().available_time_period,
+                            phone: child.val().phone,
+                            status: child.val().uid,
+                            coordinates: child.val().coordinates,
+                            latitude: child.val().latitude,
+                            longitude: child.val().longitude,
+                            blood_type: child.val().blood_type
+
+                        });
+                    });
+                    let { region } = this.state;
+                    let { latitude, longitude } = region;
+
+
+                    let markers = items.map(feature => {
+                        let coords = feature.coordinates
+                        console.log(coords);
+                        // let data = feature.properties
+
+                        return {
+                            coordinate: {
+                                latitude: coords.latitude,
+                                longitude: coords.longitude,
+                            },
+                            properties: {
+                                bloodtype: feature.blood_type,
+                                Name: feature.name
+                            }
+
                         }
-                    }
-                }).filter(marker => {
-                    let distance = this.calculateDistance(latitude, longitude, marker.coordinate.latitude, marker.coordinate.longitude);
-                    return distance <= this.state.value;
+
+                    }).filter(marker => {
+                        console.log(latitude, 'lat');
+                        console.log(longitude, 'lon');
+                        console.log(marker.coordinate.longiy, 'marklat');
+                        console.log(marker.coordinate.longitude, 'marklon');
+                        let distance = this.calculateDistance(latitude, longitude, marker.coordinate.latitude, marker.coordinate.longitude);
+                        return distance <= this.state.value;
+                    });
+
+
+                    this.setState({
+                        markers: markers,
+                        loaded: true,
+                    });
+                    // this.setState({ arrData: items });
                 });
-
-
-                this.setState({
-                    markers: markers,
-                    loaded: true,
-                });
-
-                // console.log(this.state.arrData)
+                console.log(this.state.arrData)
             }).done();
-
     }
 
     calculateDistance(origLat, origLon, markerLat, markerLon) {
@@ -142,20 +198,19 @@ class Grillplaetze extends React.Component {
 
                     {this.state.markers.map(marker => (
 
-
                         <MapView.Marker
                             key={Math.random()}
                             style={{ width: 40, height: 40 }}
                             coordinate={marker.coordinate}
                             description="Varun"
-                            title={marker.properties.title}
+                            title={marker.name}
                             // opacity={0.5}
                             image={require('./assets/mark80.bmp')}
                         // icon={require('./assets/varun.jpg')}
                         />
 
-
-                    ))}
+                    )
+                    )}
                     <MapView.Circle
                         center={this.state.region}
                         radius={this.state.value}

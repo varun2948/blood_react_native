@@ -59,7 +59,7 @@ export default class SignUp extends React.Component {
                         name: this.state.name,
                         address: this.state.address,
                         uid: res.user.uid,
-                        coordinates: { longitude: this.state.region.longitude, latitude: this.state.region.latitude },
+                        coordinates: { latitude: this.state.region.latitude, longitude: this.state.region.longitude },
                     })
                     console.log(res);
                     this.props.navigation.navigate('SignIn');
