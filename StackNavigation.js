@@ -8,7 +8,7 @@ import SignUp from './SignUp';
 import MainHome from './components/MainHome';
 
 const MainNavigator = createStackNavigator({
-    Main: { screen: Main },
+    Main: { screen: Spielplaetze },
     // Home: { screen: Home }
     MapPage: { screen: Spielplaetze },
     SignIn: { screen: SignIn },

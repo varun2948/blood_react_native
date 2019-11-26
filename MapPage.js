@@ -1,9 +1,18 @@
 import React from 'react';
-import MapView from 'react-native-maps';
+import MapView, {
+    Marker,
+    Callout,
+    CalloutSubview,
+    ProviderPropType,
+} from 'react-native-maps';
 import { Markers } from 'react-native-maps';
 import { Slider } from 'react-native';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import * as firebase from "firebase";
+import firestore from 'firebase/firestore';
+import * as theme from "./theme";
+import * as mocks from "./mocks";
+import moment from 'moment';
 
 import {
     View,
@@ -34,7 +43,8 @@ class Grillplaetze extends React.Component {
             data: [],
             loaded: false,
             radius: 40 * 1000,
-            value: 40 * 1000
+            value: 40 * 1000,
+            time: '',
 
         }
 
@@ -44,17 +54,25 @@ class Grillplaetze extends React.Component {
 
     componentDidMount() {
         this.getPosition();
+
+
+        //Getting the current date-time with required format and UTC   
+        var date = moment()
+            .utcOffset('+05:30')
+            .format('hh:mm:ss a');
+
+        this.setState({ time: date });
+
     }
 
     getPosition() {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                console.log(position);
                 this.setState({
                     region: {
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude,
-                        latitudeDelta: 0.020,
+                        latitudeDelta: 1.050,
                         longitudeDelta: 0.020,
                     }
 
@@ -62,7 +80,7 @@ class Grillplaetze extends React.Component {
                 }, () => this.getLocations());
             },
             (error) => this.setState({ error: error.message }),
-            { enableHighAccuracy: false, timeout: 2000, maximumAge: 1000 },
+            { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 },
         );
     }
 
@@ -99,24 +117,26 @@ class Grillplaetze extends React.Component {
                 //     markers: markers,
                 //     loaded: true,
                 // });
-                var ref = firebase.database().ref("users"); //Here assuming 'Users' as main table of contents   
+                // var ref = firebase.database().ref("users"); //Here assuming 'Users' as main table of contents   
+                const ref = firebase.firestore().collection('users');
+                // ref.once('value').then(snapshot => {
 
-                ref.once('value').then(snapshot => {
-                    console.log(snapshot.val());
-
+                ref.onSnapshot((snapshot) => {
                     // get children as an array
                     var items = [];
                     snapshot.forEach((child) => {
                         items.push({
-                            id: child.val().id,
-                            name: child.val().name,
-                            available_time_period: child.val().available_time_period,
-                            phone: child.val().phone,
-                            status: child.val().uid,
-                            coordinates: child.val().coordinates,
-                            latitude: child.val().latitude,
-                            longitude: child.val().longitude,
-                            blood_type: child.val().blood_type
+                            id: child.data().id,
+                            name: child.data().name,
+                            available_time_period: child.data().available_time_period,
+                            phone: child.data().phone,
+                            status: child.data().uid,
+                            coordinates: child.data().coordinates,
+                            timefrom: child.data().timefrom,
+                            timeto: child.data().timeto,
+                            latitude: child.data().latitude,
+                            longitude: child.data().longitude,
+                            blood_type: child.data().blood_type
 
                         });
                     });
@@ -125,8 +145,7 @@ class Grillplaetze extends React.Component {
 
 
                     let markers = items.map(feature => {
-                        let coords = feature.coordinates
-                        console.log(coords);
+                        let coords = feature.coordinates;
                         // let data = feature.properties
 
                         return {
@@ -136,16 +155,14 @@ class Grillplaetze extends React.Component {
                             },
                             properties: {
                                 bloodtype: feature.blood_type,
-                                Name: feature.name
+                                Name: feature.name,
+                                timefrom: feature.timefrom,
+                                timeto: feature.timeto,
                             }
 
                         }
 
                     }).filter(marker => {
-                        console.log(latitude, 'lat');
-                        console.log(longitude, 'lon');
-                        console.log(marker.coordinate.longiy, 'marklat');
-                        console.log(marker.coordinate.longitude, 'marklon');
                         let distance = this.calculateDistance(latitude, longitude, marker.coordinate.latitude, marker.coordinate.longitude);
                         return distance <= this.state.value;
                     });
@@ -157,7 +174,6 @@ class Grillplaetze extends React.Component {
                     });
                     // this.setState({ arrData: items });
                 });
-                console.log(this.state.arrData)
             }).done();
     }
 
@@ -170,8 +186,7 @@ class Grillplaetze extends React.Component {
 
 
     render() {
-
-        // console.log(this.state.markers, "markers");
+        console.log(this.state.time);
         return (
             <View style={styles.container}>
                 <View style={styles.slider}>
@@ -196,21 +211,72 @@ class Grillplaetze extends React.Component {
                     showsUserLocation={true}
                 >
 
-                    {this.state.markers.map(marker => (
+                    {this.state.markers.map(marker => {
+                        const startTime = marker.properties.timefrom;
+                        const endTime = marker.properties.timeto;
+                        let currentDate = new Date();
+                        startDate = new Date(currentDate.getTime());
+                        startDate.setHours(startTime.split(":")[0]);
+                        startDate.setMinutes(startTime.split(":")[1]);
 
-                        <MapView.Marker
-                            key={Math.random()}
-                            style={{ width: 40, height: 40 }}
-                            coordinate={marker.coordinate}
-                            description="Varun"
-                            title={marker.name}
-                            // opacity={0.5}
-                            image={require('./assets/mark80.bmp')}
-                        // icon={require('./assets/varun.jpg')}
-                        />
+                        endDate = new Date(currentDate.getTime());
+                        endDate.setHours(endTime.split(":")[0]);
+                        endDate.setMinutes(endTime.split(":")[1]);
+                        valid = startDate < currentDate && endDate > currentDate
+                        console.log(valid, 'valid');
+                        if (valid == true) {
+                            return (
 
-                    )
-                    )}
+                                <MapView.Marker
+                                    ref={ref => {
+                                        this.marker1 = ref;
+                                    }}
+                                    key={Math.random()}
+                                    style={{ width: 40, height: 40 }}
+                                    coordinate={marker.coordinate}
+                                    description="Varun"
+                                    title={marker.name}
+                                    // opacity={0.5}
+                                    image={require('./assets/blue.png')}
+                                // icon={require('./assets/varun.jpg')}
+                                >
+                                    <Callout  >
+                                        <View style={styles.plainView} >
+                                            <Text style={styles.whitetext} >Bloodtype: <Text style={styles.redcolor}>{marker.properties.bloodtype}</Text></Text>
+                                            <Text style={styles.whitetext}>Name: {marker.properties.Name}</Text>
+                                        </View>
+                                    </Callout>
+                                </MapView.Marker>
+
+                            )
+                        }
+                        return (
+
+                            <MapView.Marker
+                                ref={ref => {
+                                    this.marker1 = ref;
+                                }}
+                                key={Math.random()}
+                                style={{ width: 40, height: 40 }}
+                                coordinate={marker.coordinate}
+                                description="Varun"
+                                title={marker.name}
+                                // opacity={0.5}
+                                image={require('./assets/mark80.bmp')}
+                            // icon={require('./assets/varun.jpg')}
+                            >
+                                <Callout  >
+                                    <View style={styles.plainView} >
+                                        <Text style={styles.whitetext} >Bloodtype: <Text style={styles.redcolor}>{marker.properties.bloodtype}</Text></Text>
+                                        <Text style={styles.whitetext}>Name: {marker.properties.Name}</Text>
+                                        <Text style={styles.whitetext}>Not Available at This Time</Text>
+                                    </View>
+                                </Callout>
+                            </MapView.Marker>
+
+                        )
+                    })}
+
                     <MapView.Circle
                         center={this.state.region}
                         radius={this.state.value}
@@ -235,11 +301,29 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#ecf0f1',
+        justifyContent: 'space-between'
 
     },
+    redcolor: {
+        color: "#fa99a7",
+        fontWeight: "bold",
+        fontSize: 20,
+    },
+    plainView: {
+        backgroundColor: "#5957ba",
+        color: "white",
+        width: 200,
+        // alignSelf: 'center',
+        // padding: 5
+
+    },
+
     map: {
         width: "100%",
         height: "90%",
+    },
+    whitetext: {
+        color: "white"
     },
     buttonContainer: {
         flex: 1,
@@ -250,13 +334,23 @@ const styles = StyleSheet.create({
     buttons: {
         flex: 1,
     },
+    // slider: {
+    //     flex: 1,
+    //     width: '90%',
+    //     marginLeft: 10,
+    //     marginRight: 10,
+    //     alignItems: "stretch",
+    //     justifyContent: "center",
+    // },
     slider: {
-        flex: 1,
-        width: '90%',
-        marginLeft: 10,
-        marginRight: 10,
-        alignItems: "stretch",
-        justifyContent: "center"
+        width: '100%',
+        backgroundColor: '#1cee67',
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        position: 'absolute',
+        bottom: 20,
+        // marginBottom: 20,
     }
+
 
 })

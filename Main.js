@@ -85,18 +85,21 @@ class Main extends React.Component {
 
         return (
             <Block flex={0.42} column style={{ paddingHorizontal: 15 }}>
+
                 <Block flex={false} row style={{ paddingVertical: 40 }}>
-                    <Block center>
+                    <Block center >
                         <Text h3 white style={{ marginRight: -(25 + 5) }}>
-                            Blood Requests Varun
-            </Text>
+                            Blood Requests
+                         </Text>
                         <Button
+
                             onPress={() => this.props.navigation.navigate('SignIn')}
                             title="LogIn"
                             color="#841584"
                             accessibilityLabel="Learn more about this purple button"
                         />
                         <Button
+
                             onPress={() => this.props.navigation.navigate('SignUp')}
                             title="SignUp"
                             color="#841584"
@@ -115,12 +118,12 @@ class Main extends React.Component {
                         justifyContent: 'center',
                         alignItems: 'center'
                     }]}>
-                        <Button
+                        {/* <Button
                             onPress={() => this.props.navigation.navigate('MapPage')}
                             title="Go to Next Page"
                             color="#841584"
                             accessibilityLabel="Learn more about this purple button"
-                        />
+                        /> */}
                     </View>
                     <Block row space="between" style={{ paddingHorizontal: 30 }}>
                         <Block flex={false} row center>
@@ -221,12 +224,12 @@ class Main extends React.Component {
                         justifyContent: 'center',
                         alignItems: 'center'
                     }]}>
-                        <Button
+                        {/* <Button
                             onPress={() => this.props.navigation.navigate('LoginView')}
                             title="LogIn"
                             color="#841584"
                             accessibilityLabel="Learn more about this purple button"
-                        />
+                        /> */}
                     </View>
                 </ScrollView>
             </Block>
