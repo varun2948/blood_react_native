@@ -1,6 +1,7 @@
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import Main from './Main';
 import { Home } from "./components";
+import HomePage from './HomePage';
 import Spielplaetze from './MapPage';
 import SignIn from './SignIn';
 import Loading from './components/Loading';

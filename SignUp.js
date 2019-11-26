@@ -16,6 +16,7 @@ export default class SignUp extends React.Component {
             name: "",
             address: "",
             email: "",
+            phoneno: "",
             blood_type: "",
             latitude: "",
             longitude: "",
@@ -106,6 +107,7 @@ export default class SignUp extends React.Component {
                         ref.add({
                             email: this.state.email,
                             blood_type: this.state.blood_type,
+                            phoneno: this.state.phoneno,
                             timefrom: this.state.timefrom,
                             timeto: this.state.timeto,
                             gender: this.state.gender,
@@ -206,6 +208,14 @@ export default class SignUp extends React.Component {
                                 autoCapitalize="none"
                                 autoCorrect={false}
                                 onChangeText={name => this.setState({ name })}
+                            />
+                        </Item>
+                        <Item floatingLabel>
+                            <Label>Phone No</Label>
+                            <Input
+                                autoCorrect={false}
+                                keyboardType={'phone-pad'}
+                                onChangeText={phoneno => this.setState({ phoneno })}
                             />
                         </Item>
                         <Item floatingLabel>
@@ -320,7 +330,7 @@ export default class SignUp extends React.Component {
                             onConfirm={(hour, minute) => this.onConfirm(hour, minute)}
                         />
                     </View> */}
-                        <Item floatingLabel>
+                        <Item floatingLabel style={{ marginTop: 4 }}>
                             <Label>Password</Label>
                             <Input
                                 secureTextEntry={true}
@@ -330,7 +340,7 @@ export default class SignUp extends React.Component {
                             />
                         </Item>
 
-                        <Button full rounded primary style={{ marginTop: 40 }} color="#841584"
+                        <Button full rounded primary style={{ marginTop: 15 }} color="#841584"
                             onPress={() => this.SignUp(this.state.email, this.state.password)}>
                             <Text white >SignUp</Text>
                         </Button>

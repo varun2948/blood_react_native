@@ -6,9 +6,17 @@ import MapView, {
     ProviderPropType,
 } from 'react-native-maps';
 import { Markers } from 'react-native-maps';
-import { Slider } from 'react-native';
+import { Slider, Linking, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import * as firebase from "firebase";
+import Modal, {
+    ModalContent,
+    ModalTitle,
+    ModalFooter,
+    ModalButton,
+    SlideAnimation,
+    ScaleAnimation,
+} from 'react-native-modals';
 import firestore from 'firebase/firestore';
 import * as theme from "./theme";
 import * as mocks from "./mocks";
@@ -21,6 +29,7 @@ import {
     Button,
     TextInput,
 } from "react-native";
+import { underline } from 'ansi-colors';
 
 const geolib = require('geolib');
 
@@ -45,6 +54,12 @@ class Grillplaetze extends React.Component {
             radius: 40 * 1000,
             value: 40 * 1000,
             time: '',
+            visible: false,
+            bottomModalAndTitle: false,
+            loading: true,
+            valids: true,
+            modalData: [],
+            loaderZindex: 1,
 
         }
 
@@ -128,16 +143,16 @@ class Grillplaetze extends React.Component {
                         items.push({
                             id: child.data().id,
                             name: child.data().name,
-                            available_time_period: child.data().available_time_period,
-                            phone: child.data().phone,
+                            address: child.data().address,
+                            phoneno: child.data().phoneno,
                             status: child.data().uid,
                             coordinates: child.data().coordinates,
                             timefrom: child.data().timefrom,
                             timeto: child.data().timeto,
+                            gender: child.data().gender,
                             latitude: child.data().latitude,
                             longitude: child.data().longitude,
                             blood_type: child.data().blood_type
-
                         });
                     });
                     let { region } = this.state;
@@ -155,9 +170,12 @@ class Grillplaetze extends React.Component {
                             },
                             properties: {
                                 bloodtype: feature.blood_type,
-                                Name: feature.name,
+                                name: feature.name,
                                 timefrom: feature.timefrom,
                                 timeto: feature.timeto,
+                                address: feature.address,
+                                phoneno: feature.phoneno,
+                                gender: feature.gender,
                             }
 
                         }
@@ -171,6 +189,8 @@ class Grillplaetze extends React.Component {
                     this.setState({
                         markers: markers,
                         loaded: true,
+                        loading: false,
+                        loaderZindex: 0,
                     });
                     // this.setState({ arrData: items });
                 });
@@ -189,6 +209,18 @@ class Grillplaetze extends React.Component {
         console.log(this.state.time);
         return (
             <View style={styles.container}>
+                <View style={{
+                    position: 'absolute',
+                    left: 0,
+                    zIndex: this.state.loaderZindex,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <ActivityIndicator animating={this.state.loading} size="large" color="#ef0652" />
+                </View>
                 <View style={styles.slider}>
                     <Slider
                         maximumValue={this.state.radius}
@@ -223,7 +255,11 @@ class Grillplaetze extends React.Component {
                         endDate.setHours(endTime.split(":")[0]);
                         endDate.setMinutes(endTime.split(":")[1]);
                         valid = startDate < currentDate && endDate > currentDate
-                        console.log(valid, 'valid');
+
+
+
+
+
                         if (valid == true) {
                             return (
 
@@ -237,7 +273,16 @@ class Grillplaetze extends React.Component {
                                     description="Varun"
                                     title={marker.name}
                                     // opacity={0.5}
+                                    onPress={() => {
+
+                                        this.setState({
+                                            bottomModalAndTitle: true,
+                                            valids: true,
+                                            modalData: marker.properties,
+                                        });
+                                    }}
                                     image={require('./assets/blue.png')}
+
                                 // icon={require('./assets/varun.jpg')}
                                 >
                                     <Callout  >
@@ -248,35 +293,80 @@ class Grillplaetze extends React.Component {
                                     </Callout>
                                 </MapView.Marker>
 
+
                             )
                         }
-                        return (
+                        else {
+                            return (
 
-                            <MapView.Marker
-                                ref={ref => {
-                                    this.marker1 = ref;
-                                }}
-                                key={Math.random()}
-                                style={{ width: 40, height: 40 }}
-                                coordinate={marker.coordinate}
-                                description="Varun"
-                                title={marker.name}
-                                // opacity={0.5}
-                                image={require('./assets/mark80.bmp')}
-                            // icon={require('./assets/varun.jpg')}
-                            >
-                                <Callout  >
-                                    <View style={styles.plainView} >
-                                        <Text style={styles.whitetext} >Bloodtype: <Text style={styles.redcolor}>{marker.properties.bloodtype}</Text></Text>
-                                        <Text style={styles.whitetext}>Name: {marker.properties.Name}</Text>
-                                        <Text style={styles.whitetext}>Not Available at This Time</Text>
-                                    </View>
-                                </Callout>
-                            </MapView.Marker>
+                                <MapView.Marker
+                                    ref={ref => {
+                                        this.marker1 = ref;
+                                    }}
+                                    key={Math.random()}
+                                    style={{ width: 40, height: 40 }}
+                                    coordinate={marker.coordinate}
+                                    description="Varun"
+                                    title={marker.name}
+                                    // opacity={0.5}
+                                    onPress={() => {
 
-                        )
+                                        this.setState({
+                                            bottomModalAndTitle: true,
+                                            modalData: marker.properties,
+                                            valids: false,
+                                        });
+                                    }}
+                                    image={require('./assets/mark80.bmp')}
+                                // icon={require('./assets/varun.jpg')}
+                                >
+                                    <Callout  >
+                                        <View style={styles.plainView} >
+                                            <Text style={styles.whitetext} >Bloodtype: <Text style={styles.redcolor}>{marker.properties.bloodtype}</Text></Text>
+                                            <Text style={styles.whitetext}>Name: {marker.properties.Name}</Text>
+                                            <Text style={styles.whitetext}>Not Available at This Time</Text>
+                                        </View>
+                                    </Callout>
+                                </MapView.Marker>
+
+                            )
+                        }
+
                     })}
+                    <Modal.BottomModal
+                        visible={this.state.bottomModalAndTitle}
+                        onTouchOutside={() => this.setState({ bottomModalAndTitle: false })}
+                        height={0.4}
+                        width={1}
+                        onSwipeOut={() => this.setState({ bottomModalAndTitle: false })}
+                        modalTitle={
+                            <ModalTitle
+                                title="Blood Donor Details"
+                                hasTitleBar
+                            />
+                        }
+                    >
+                        <ModalContent
+                            style={{
+                                flex: 1,
+                                backgroundColor: 'fff',
+                            }}>
+                            <Text  >Bloodtype: <Text style={styles.redcolor}>{this.state.modalData.bloodtype}</Text></Text>
+                            <Text >Name: <Text style={styles.bigText}>{this.state.modalData.name}</Text></Text>
+                            {/* <TouchableOpacity > */}
+                            <Text >Number: <Text onPress={() => { Linking.openURL(`tel:${'119'}`); }} style={styles.blacktext} onClick> +9779845662948</Text> <Text style={{ color: 'red', fontSize: 12 }}>  (Tap to Call) </Text></Text>
+                            <Text >Address: <Text style={styles.bigText}>{this.state.modalData.address}</Text></Text>
+                            <Text >Gender: <Text style={styles.bigText}>{this.state.modalData.gender}</Text></Text>
+                            <Text >Available From: <Text style={styles.bigText}>{this.state.modalData.timefrom}</Text></Text>
+                            <Text >Available To: <Text style={styles.bigText}>{this.state.modalData.timeto}</Text></Text>
 
+                            {(this.state.valids == true) ? <Text style={{ fontWeight: "bold", fontSize: 15 }} >Availability: <Text style={{ color: 'red', fontSize: 15, fontWeight: 'bold' }}>Available To Donate &#10004;  </Text></Text> : <Text style={{ fontWeight: "bold", fontSize: 15 }} >Availability: <Text style={{ color: 'red', fontSize: 15, fontWeight: 'bold' }}>Not Available To Donate &#10799;  </Text></Text>
+
+                            }
+                            {/* </TouchableOpacity> */}
+
+                        </ModalContent>
+                    </Modal.BottomModal>
                     <MapView.Circle
                         center={this.state.region}
                         radius={this.state.value}
@@ -309,6 +399,10 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
+    bigText: {
+        fontSize: 15,
+        fontWeight: "bold",
+    },
     plainView: {
         backgroundColor: "#5957ba",
         color: "white",
@@ -324,6 +418,12 @@ const styles = StyleSheet.create({
     },
     whitetext: {
         color: "white"
+    },
+    blacktext: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "blue",
+        textDecorationLine: 'underline',
     },
     buttonContainer: {
         flex: 1,
@@ -350,7 +450,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 20,
         // marginBottom: 20,
+    },
+    loading: {
+        position: 'absolute',
+        left: 0,
+        zIndex: 1,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
-
 
 })
