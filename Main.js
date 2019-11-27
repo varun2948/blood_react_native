@@ -6,24 +6,32 @@ import {
     Image,
     Button,
     View,
-    TouchableOpacity
+    TouchableOpacity,
+    BackHandler,
+    Alert
 } from "react-native";
 import * as Font from "expo-font";
 import { LineChart, Path } from 'react-native-svg-charts';
 import { Line } from "react-native-svg";
 import * as shape from 'd3-shape';
-
+import { FloatingAction } from "react-native-floating-action";
+import Property from "./components/Property";
 import { Block, Text, Home } from "./components";
 import * as theme from "./theme";
 import * as mocks from "./mocks";
+import * as firebase from "firebase";
 
 
 
 class Main extends React.Component {
-    state = {
-        fontsLoaded: false
+    static navigationOptions = {
+        title: "Right position"
     };
+    state = {
+        fontsLoaded: false,
+        data: [],
 
+    };
     loadFonts() {
         return Font.loadAsync({
             "Montserrat-Regular": require("./assets/fonts/Montserrat-Regular.ttf"),
@@ -33,9 +41,65 @@ class Main extends React.Component {
             "Montserrat-Light": require("./assets/fonts/Montserrat-Light.ttf")
         });
     }
+    loadBloodRequests = () => {
+        const ref = firebase.firestore().collection('blood_requests');
+        // ref.once('value').then(snapshot => {
 
+        ref.onSnapshot((snapshot) => {
+            // get children as an array
+            var items = [];
+            snapshot.forEach((child) => {
+                items.push({
+                    id: child.data().id,
+                    name: child.data().name,
+                    address: child.data().address,
+                    phoneno: child.data().phoneno,
+                    age: child.data().age,
+                    // status: child.data().uid,
+                    coordinates: child.data().coordinates,
+                    time_allocation: child.data().time_allocation,
+                    gender: child.data().gender,
+                    bloodtype: child.data().bloodtype
+                });
+            });
+            this.setState({ data: items });
+            console.log(this.state.data, 'data');
+        });
+
+    }
+    onButtonPress = () => {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        // then navigate
+        navigate('NewScreen');
+    }
+
+    handleBackButton = () => {
+        Alert.alert(
+            'Exit App',
+            'Exiting the application?', [{
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel'
+            }, {
+                text: 'OK',
+                onPress: () => BackHandler.exitApp()
+            },], {
+            cancelable: false
+        }
+        )
+        return true;
+    }
+
+
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
     async componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
         await this.loadFonts();
+        await this.loadBloodRequests();
+
         this.setState({ fontsLoaded: true });
     }
 
@@ -76,13 +140,24 @@ class Main extends React.Component {
                     strokeDasharray={[2, 10]}
                     strokeWidth={1}
                 />
-            </LineChart>
+            </LineChart >
         );
     }
 
     renderHeader() {
-        const { user } = this.props;
 
+        const { user } = this.props;
+        const { data } = this.state;
+        // console.log(typeof (data), 'lengt');
+        var count = 0;
+        var i;
+
+        for (i in data) {
+            if (data.hasOwnProperty(i)) {
+                count++;
+            }
+        }
+        console.log(count, 's');
         return (
             <Block flex={0.42} column style={{ paddingHorizontal: 15 }}>
 
@@ -92,20 +167,20 @@ class Main extends React.Component {
                             Blood Requests
                          </Text>
                         <Button
-
-                            onPress={() => this.props.navigation.navigate('SignIn')}
-                            title="LogIn"
-                            color="#841584"
+                            style={{ marginTop: 30 }}
+                            onPress={() => this.props.navigation.navigate('MapPage')}
+                            title="Search For Nearest Blood"
+                            color="#007bff"
                             accessibilityLabel="Learn more about this purple button"
                         />
-                        <Button
+                        {/* <Button
 
                             onPress={() => this.props.navigation.navigate('SignUp')}
                             title="SignUp"
                             color="#841584"
                             style={styles.signUpbtn}
                             accessibilityLabel="Learn more about this purple button"
-                        />
+                        /> */}
                     </Block>
 
                     <Image style={styles.avatar} source={user.avatar} />
@@ -133,10 +208,11 @@ class Main extends React.Component {
               </Text>
                         </Block>
                         <Block flex={false} row center>
+                            <Text h1>{count}</Text>
                             <Text caption bold primary style={{ paddingHorizontal: 10 }}>
                                 +49%
               </Text>
-                            <Text h1>481</Text>
+
                         </Block>
                     </Block>
                     <Block
@@ -160,7 +236,8 @@ class Main extends React.Component {
         );
     }
 
-    renderRequest(request) {
+    renderRequest(request, key, count) {
+
         return (
             <Block row card shadow color="white" style={styles.request}>
                 <Block
@@ -177,15 +254,18 @@ class Main extends React.Component {
                     </Block>
                     <Block flex={0.7} center middle>
                         <Text h2 white>
-                            {request.bloodType}
+                            {request.bloodtype}
                         </Text>
                     </Block>
                 </Block>
                 <Block flex={0.75} column middle>
                     <Text h3 style={{ paddingVertical: 8, }}>{request.name}</Text>
                     <Text caption semibold>
-                        {request.age}  •  {request.gender}  •  {request.distance}km  •  {request.time}hrs
-          </Text>
+                        {request.age}  •  {request.gender}  •  {request.distance}km  •  {request.time_allocation}hrs
+                    </Text>
+                    <Text h2 style={{ paddingVertical: 8, }} caption semibold>
+                        {request.address}
+                    </Text>
                 </Block>
             </Block>
 
@@ -200,8 +280,10 @@ class Main extends React.Component {
         );
 
     }
+
     renderRequests() {
-        const { requests } = this.props;
+        const { data } = this.state;
+
 
         return (
             <Block flex={0.8} column color="gray2" style={styles.requests}>
@@ -212,12 +294,19 @@ class Main extends React.Component {
                     </TouchableOpacity>
                 </Block>
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    {requests.map(request => (
-                        <TouchableOpacity activeOpacity={0.8} key={`request-${request.id}`}>
-                            {this.renderRequest(request)}
 
-                        </TouchableOpacity>
-                    ))}
+                    {data.map((request, key) => {
+
+
+                        return (
+
+                            <TouchableOpacity activeOpacity={0.8} key={`request-${key}`}>
+                                {this.renderRequest(request, key)}
+
+                            </TouchableOpacity>
+                        )
+
+                    })}
                     <View style={[{
                         width: '100%',
                         // height: '30%',
@@ -231,12 +320,59 @@ class Main extends React.Component {
                             accessibilityLabel="Learn more about this purple button"
                         /> */}
                     </View>
+
                 </ScrollView>
             </Block>
         );
     }
+    renderFloatButton() {
+        const actions = [
+            {
+                text: "Add Blood Request",
+                icon: require("./images/add_blood.png"),
+                name: "add_blood",
+                position: 2
+            },
+            {
+                text: "Search Donor in Map",
+                icon: require("./images/ic_accessibility_white.png"),
+                name: "search_donor",
+                position: 3
+            },
+            {
+                text: "About Us",
+                icon: require("./images/ic_accessibility_white.png"),
+                name: "about_us",
+                position: 4
+            }
+        ];
+        return (
+            // <View style={styles.container}>
+            <FloatingAction
+                color={theme.colors.primary}
+                buttonSize={60}
+                actions={actions}
+                onPressItem={name => {
+                    // console.log(`selected button: ${name}`);
+                    switch (name) {
+                        case 'add_blood':
+                            return this.props.navigation.navigate('AddBlood');
+                        case 'search_donor':
+                            return this.props.navigation.navigate('MapPage');
+                        case 'about_us':
+                            return this.props.navigation.navigate('AboutUs');
+                        default:
+                            return null;
+                    }
+                }
+                }
+            />
+            // </View>
+        );
+    }
 
     render() {
+
         if (!this.state.fontsLoaded) {
             return (
                 <Block center middle>
@@ -253,7 +389,9 @@ class Main extends React.Component {
             <SafeAreaView style={styles.safe}>
                 {this.renderHeader()}
                 {this.renderRequests()}
+                {this.renderFloatButton()}
             </SafeAreaView>
+
 
 
         );
@@ -269,6 +407,9 @@ Main.defaultProps = {
 export default Main;
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     safe: {
         flex: 1,
         backgroundColor: theme.colors.primary

@@ -2,9 +2,9 @@
   "devToolsPort": 19002,
   "expoServerPort": 19000,
   "packagerPort": 19001,
-  "packagerPid": 6642,
+  "packagerPid": 24282,
   "expoServerNgrokUrl": "https://eu-msd.anonymous.iblood.exp.direct",
   "packagerNgrokUrl": "https://packager.eu-msd.anonymous.iblood.exp.direct",
-  "ngrokPid": 6735,
+  "ngrokPid": 24347,
   "webpackServerPort": null
 }

@@ -63,7 +63,7 @@ export default class SignIn extends React.Component {
         // }
         try {
             firebase.auth().signInWithEmailAndPassword(email, password)
-                .then(() => this.props.navigation.navigate('MapPage'))
+                .then(() => this.props.navigation.navigate('Home'))
                 .catch(error => {
                     alert("Email Doesnt Exist");
                 })

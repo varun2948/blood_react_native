@@ -9,7 +9,7 @@ import firestore from 'firebase/firestore';
 const { State: TextInputState } = TextInput;
 
 
-export default class SignUp extends React.Component {
+export default class SignUpBloodDonee extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -17,13 +17,10 @@ export default class SignUp extends React.Component {
             address: "",
             email: "",
             phoneno: "",
-            blood_type: "",
             latitude: "",
             longitude: "",
             gender: "",
             password: "",
-            timefrom: "0:00",
-            timeto: "0:00",
             shift: new Animated.Value(0),
             region: {
                 latitude: 0,
@@ -37,7 +34,7 @@ export default class SignUp extends React.Component {
     getPosition = () => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                console.log(position, "position");
+                console.log(position);
                 this.setState({
                     region: {
                         latitude: position.coords.latitude,
@@ -72,7 +69,7 @@ export default class SignUp extends React.Component {
         this.TimePicker1.close();
     }
     SignUp = () => {
-        this.getPosition()
+        this.getPosition();
         console.log("Signup Inside");
 
         if (this.state.name == "") {
@@ -103,13 +100,10 @@ export default class SignUp extends React.Component {
                         // })
 
 
-                        const ref = firebase.firestore().collection('users');
+                        const ref = firebase.firestore().collection('blood_receiver_users');
                         ref.add({
                             email: this.state.email,
-                            blood_type: this.state.blood_type,
                             phoneno: this.state.phoneno,
-                            timefrom: this.state.timefrom,
-                            timeto: this.state.timeto,
                             gender: this.state.gender,
                             name: this.state.name,
                             address: this.state.address,
@@ -226,15 +220,6 @@ export default class SignUp extends React.Component {
                                 onChangeText={address => this.setState({ address })}
                             />
                         </Item>
-                        {/* <Item floatingLabel>
-                        <Label>Blood Type</Label>
-                        <Input
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            onChangeText={blood_type => this.setState({ blood_type })}
-                        />
-                    </Item> */}
-                        {/* <Item floatingLabel> */}
                         <View floatingLabel style={{ marginTop: 10, marginLeft: 10 }}>
                             <Picker
                                 placeholder="Gender"
@@ -255,81 +240,7 @@ export default class SignUp extends React.Component {
                                 <Picker.Item label="Other" value="other" />
                             </Picker>
                         </View>
-                        <View floatingLabel style={{ marginTop: 10, marginLeft: 10 }}>
-                            <Picker
-                                style={styles.button}
-                                placeholder="Pick a Blood Type"
-                                floatingLabel style={styles.pickerStyle}
-                                selectedValue={this.state.blood_type}
-                                onValueChange={(itemValue, itemPosition) => {
-                                    if (itemValue == 0) {
-                                        alert('Select Blood Type First');
-                                    }
-                                    else {
-                                        this.setState({ language: itemValue, choosenIndex: itemPosition, blood_type: itemValue })
-                                    }
-                                }}
-                            >
-                                <Picker.Item disabled={true} label="Select Blood Type" value="0" />
-                                <Picker.Item label="A+" value="A+" />
-                                <Picker.Item label="A-" value="A-" />
-                                <Picker.Item label="B+" value="B+" />
-                                <Picker.Item label="B-" value="B-" />
-                                <Picker.Item label="0+" value="0+" />
-                                <Picker.Item label="0-" value="0-" />
-                                <Picker.Item label="AB+" value="AB+" />
-                                <Picker.Item label="AB-" value="AB-" />
-                            </Picker>
-                        </View>
-                        {/* </Item> */}
-                        <View floatingLabel >
-                            <TouchableOpacity
-                                onPress={() => this.TimePicker.open()}
-                                style={styles.button}
-                            >
-                                <Text style={styles.buttonText}>Available From</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.text}>{this.state.timefrom}</Text>
-                            <TimePicker
-                                ref={ref => {
-                                    this.TimePicker = ref;
-                                }}
-                                onCancel={() => this.onCancel()}
-                                onConfirm={(hour, minute) => this.onConfirm(hour, minute)}
-                            />
-                        </View>
-                        <View floatingLabel >
-                            <TouchableOpacity
-                                onPress={() => this.TimePicker1.open()}
-                                style={styles.button}
-                            >
-                                <Text style={styles.buttonText}>Available To</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.text}>{this.state.timeto}</Text>
-                            <TimePicker
-                                ref={ref => {
-                                    this.TimePicker1 = ref;
-                                }}
-                                onCancel={() => this.onCancel1()}
-                                onConfirm={(hour, minute) => this.onConfirm1(hour, minute)}
-                            />
-                        </View>
-                        {/* <View floatingLabel >
-                        <TouchableOpacity
-                            onPress={() => this.TimePicker.open()}
-                            style={styles.button}
-                        >
-                            <Text style={styles.buttonText}>Available To</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.text}>{this.state.timeto}</Text>
-                        <TimePicker
-                            ref={ref => {
-                                this.TimePicker = ref;
-                            }}
-                            onCancel={() => this.onCancel()}
-                            onConfirm={(hour, minute) => this.onConfirm(hour, minute)}
-                        />
-                    </View> */}
+
                         <Item floatingLabel style={{ marginTop: 4 }}>
                             <Label>Password</Label>
                             <Input

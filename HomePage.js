@@ -24,7 +24,7 @@ class HomePage extends Component {
                     <Button color="red" title="SignUp as Blood Donor" onPress={() => this.props.navigation.navigate('SignUp')} />
                 </View>
                 <View style={styles.buttonContainer}>
-                    <Button color="#841584" title="SignUp as Blood Donee" />
+                    <Button color="#841584" title="SignUp as Blood Donee" onPress={() => this.props.navigation.navigate('SignUpBloodDonee')} />
                 </View>
             </View>);
     }

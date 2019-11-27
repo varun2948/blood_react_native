@@ -68,6 +68,11 @@ class Grillplaetze extends React.Component {
     }
 
     componentDidMount() {
+        // this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        //     this.goBack();
+        //     this.setState({ bottomModalAndTitle: false });
+        //     return true;
+        // });
         this.getPosition();
 
 
@@ -339,6 +344,7 @@ class Grillplaetze extends React.Component {
                         height={0.4}
                         width={1}
                         onSwipeOut={() => this.setState({ bottomModalAndTitle: false })}
+                        onHardwareBackPress={() => this.setState({ bottomModalAndTitle: false })}
                         modalTitle={
                             <ModalTitle
                                 title="Blood Donor Details"
